@@ -1,0 +1,7 @@
+{
+  "name": "Proyecto Santo Domingo",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
