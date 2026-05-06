@@ -52,3 +52,7 @@ proyecto-santo-domingo/
     ├── App.tsx           # Componente raíz y definición de rutas
     └── main.tsx          # Punto de entrada de React en el DOM
 ```
+
+
+luquitas, primero instala el ionic
+npm install -g @ionic/cli
