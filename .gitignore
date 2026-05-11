@@ -29,3 +29,8 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+# Claude Code (configuración del asistente IA — no subir al repositorio)
+.claude/
+CLAUDE.md
+skills-lock.json

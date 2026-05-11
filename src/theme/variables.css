@@ -1,2 +1,113 @@
-/* For information on how to create your own theme, please refer to:
-http://ionicframework.com/docs/theming/ */
+/**
+ * @file variables.css
+ * @description Propiedades CSS globales para el tema DaisyUI "govchile" y los
+ *   tokens de componentes Ionic. Paleta principal: azul institucional (#1e40af).
+ *   Tema claro para uso en plataforma de gobierno.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── DaisyUI v5 CSS theme — govchile (azul institucional + blanco) ─── */
+[data-theme=govchile] {
+  color-scheme: light;
+
+  --color-primary:           oklch(0.38 0.18 265);
+  --color-primary-content:   oklch(1    0    0  );
+  --color-secondary:         oklch(0.55 0.18 260);
+  --color-secondary-content: oklch(1    0    0  );
+  --color-accent:            oklch(0.60 0.16  75);
+  --color-accent-content:    oklch(1    0    0  );
+  --color-neutral:           oklch(0.30 0.05 240);
+  --color-neutral-content:   oklch(0.98 0    0  );
+  --color-base-100:          oklch(1    0    0  );
+  --color-base-200:          oklch(0.97 0.005 240);
+  --color-base-300:          oklch(0.90 0.01  240);
+  --color-base-content:      oklch(0.15 0.03  240);
+  --color-info:              oklch(0.55 0.19 260);
+  --color-info-content:      oklch(1    0    0  );
+  --color-success:           oklch(0.53 0.18 145);
+  --color-success-content:   oklch(1    0    0  );
+  --color-warning:           oklch(0.65 0.16  75);
+  --color-warning-content:   oklch(1    0    0  );
+  --color-error:             oklch(0.54 0.22  29);
+  --color-error-content:     oklch(1    0    0  );
+
+  --radius-selector: 0.5rem;
+  --radius-field:    0.375rem;
+  --radius-box:      0.75rem;
+}
+
+/* ─── Ionic component tokens — govchile ─── */
+:root {
+  /* Primary brand — azul institucional */
+  --ion-color-primary:              #1e40af;
+  --ion-color-primary-rgb:          30, 64, 175;
+  --ion-color-primary-contrast:     #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade:        #1a3899;
+  --ion-color-primary-tint:         #3553b8;
+
+  /* Secondary */
+  --ion-color-secondary:              #3b82f6;
+  --ion-color-secondary-rgb:          59, 130, 246;
+  --ion-color-secondary-contrast:     #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade:        #3472d9;
+  --ion-color-secondary-tint:         #4f8ff7;
+
+  /* Success */
+  --ion-color-success:              #16a34a;
+  --ion-color-success-rgb:          22, 163, 74;
+  --ion-color-success-contrast:     #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade:        #138f42;
+  --ion-color-success-tint:         #2dac5c;
+
+  /* Danger */
+  --ion-color-danger:              #dc2626;
+  --ion-color-danger-rgb:          220, 38, 38;
+  --ion-color-danger-contrast:     #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade:        #c22222;
+  --ion-color-danger-tint:         #e03c3c;
+
+  /* Warning */
+  --ion-color-warning:              #d97706;
+  --ion-color-warning-rgb:          217, 119, 6;
+  --ion-color-warning-contrast:     #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade:        #bf6a05;
+  --ion-color-warning-tint:         #dd851f;
+
+  /* App background — blanco */
+  --ion-background-color:     #f8faff;
+  --ion-background-color-rgb: 248, 250, 255;
+
+  /* Text — oscuro */
+  --ion-text-color:     #111827;
+  --ion-text-color-rgb: 17, 24, 39;
+
+  /* Toolbar — azul institucional */
+  --ion-toolbar-background:   #1e40af;
+  --ion-toolbar-color:        #ffffff;
+  --ion-toolbar-border-color: transparent;
+
+  /* Tab bar — blanco */
+  --ion-tab-bar-background:     #ffffff;
+  --ion-tab-bar-border-color:   #e5e7eb;
+  --ion-tab-bar-color:          #6b7280;
+  --ion-tab-bar-color-selected: #1e40af;
+
+  /* Items */
+  --ion-item-background:   transparent;
+  --ion-item-border-color: #e5e7eb;
+
+  /* Card */
+  --ion-card-background: #ffffff;
+
+  /* Borders */
+  --ion-border-color:     #e5e7eb;
+  --ion-box-shadow-color: rgba(0, 0, 0, 0.08);
+}
