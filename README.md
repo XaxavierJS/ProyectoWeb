@@ -78,7 +78,7 @@ El prototipo considera versión **web** y **móvil** para 7 pantallas distintas,
 
 ### Enlace al prototipo Figma
 
-> [Ver prototipo interactivo en Figma](#) *(reemplazar con URL real)*
+> [Ver prototipo interactivo en Figma](https://www.figma.com/design/nqc68ib1kdPFLQOKlNNTQs/Untitled?node-id=1-30&t=5zTQX3heAmB0zdd9-1)  
 
 ### Pantallas prototipadas
 
