@@ -1,0 +1,261 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin_ciberseguridad",
+      "email": "admin@plataforma.cl",
+      "role": "admin",
+      "status": "activo"
+    },
+    {
+      "id": 2,
+      "username": "usuario_normal",
+      "email": "usuario@correo.cl",
+      "role": "user",
+      "status": "activo",
+      "progress": 25
+    }
+  ],
+  "modules": [
+    {
+      "id": 1,
+      "title": "Introducción a la Ciberseguridad",
+      "description": "Principios fundamentales, tríada CIA y amenazas actuales en Chile según CSIRT de Gobierno.",
+      "videoUrl": "https://www.youtube.com/embed/rcDO8km6R6c",
+      "sections": [
+        {
+          "title": "¿Qué es la Ciberseguridad?",
+          "body": "La ciberseguridad comprende las prácticas, tecnologías y procesos diseñados para proteger sistemas, redes y datos contra ataques digitales. Según el NIST (Instituto Nacional de Estándares y Tecnología de EE.UU.), se define como la prevención del daño, la protección y la restauración de computadoras, sistemas de comunicación electrónica y la información contenida en los mismos. No es un problema exclusivamente tecnológico: también involucra personas, procesos y cultura organizacional."
+        },
+        {
+          "title": "La Tríada CIA: Los Tres Pilares",
+          "body": "Los tres pilares fundamentales de la ciberseguridad se conocen como la tríada CIA: Confidencialidad (solo las personas autorizadas acceden a la información), Integridad (la información no puede ser alterada sin autorización) y Disponibilidad (los sistemas y datos deben estar accesibles cuando se necesitan). Un incidente de seguridad afecta uno o más de estos pilares; por ejemplo, un ransomware compromete la disponibilidad, mientras que una fuga de datos afecta la confidencialidad."
+        },
+        {
+          "title": "Marco Legal en Chile: CSIRT y Ley 21.663",
+          "body": "En Chile, el CSIRT de Gobierno (csirt.gob.cl) es el organismo encargado de coordinar la respuesta a incidentes de ciberseguridad en el sector público. La Ley Marco de Ciberseguridad (Ley N° 21.663, promulgada en 2024) establece obligaciones de reporte de incidentes para operadores de infraestructura crítica y crea la Agencia Nacional de Ciberseguridad (ANCI)."
+        },
+        {
+          "title": "Tu Superficie de Ataque Personal",
+          "body": "Todo usuario digital tiene una 'superficie de ataque personal': correos electrónicos, cuentas en redes sociales, banca en línea, dispositivos móviles, redes WiFi y servicios en la nube. Cada punto de acceso es una puerta potencial para un atacante. Reducir esta superficie implica: desactivar servicios que no se usan, revisar permisos de aplicaciones, mantener el software actualizado y utilizar redes privadas virtuales (VPN) en conexiones públicas."
+        },
+        {
+          "title": "Buenas Prácticas Esenciales",
+          "body": "Las buenas prácticas básicas recomendadas por la ANCI y el CSIRT de Gobierno incluyen: utilizar contraseñas únicas y robustas por servicio (mínimo 12 caracteres), activar la autenticación en dos pasos (2FA) siempre que esté disponible, mantener el sistema operativo y aplicaciones actualizados, realizar copias de seguridad periódicas siguiendo la regla 3-2-1 (3 copias, 2 soportes distintos, 1 fuera del sitio), y verificar siempre la identidad del remitente antes de hacer clic en enlaces."
+        }
+      ],
+      "sources": [
+        {
+          "title": "NIST Cybersecurity Framework v2.0",
+          "author": "National Institute of Standards and Technology (NIST)",
+          "url": "https://www.nist.gov/cyberframework"
+        },
+        {
+          "title": "Ley Marco de Ciberseguridad — Ley N° 21.663",
+          "author": "Ministerio del Interior, Gobierno de Chile",
+          "url": "https://www.bcn.cl/leychile/navegar?idNorma=1208008"
+        },
+        {
+          "title": "CSIRT de Gobierno — Reportes de Incidentes",
+          "author": "CSIRT.GOB.CL — Gobierno de Chile",
+          "url": "https://csirt.gob.cl"
+        },
+        {
+          "title": "Introduction to Cybersecurity — Curso gratuito",
+          "author": "Cisco Networking Academy",
+          "url": "https://www.netacad.com/courses/cybersecurity"
+        }
+      ],
+      "quiz": {
+        "question": "¿Cuáles son los tres principios fundamentales que conforman la tríada CIA de la ciberseguridad?",
+        "options": [
+          "Cifrado, Inteligencia Artificial y Autenticación",
+          "Confidencialidad, Integridad y Disponibilidad",
+          "Contraseña, Identificación y Acceso",
+          "Criptografía, Infraestructura y Anonimato"
+        ],
+        "answerIndex": 1
+      }
+    },
+    {
+      "id": 2,
+      "title": "Phishing e Ingeniería Social",
+      "description": "Cómo detectar, analizar y reportar intentos de engaño digital según recomendaciones del CSIRT.cl.",
+      "videoUrl": "https://www.youtube.com/embed/aO858HyFbKI",
+      "sections": [
+        {
+          "title": "¿Qué es el Phishing?",
+          "body": "El phishing es un tipo de ataque de ingeniería social que utiliza correos electrónicos, mensajes de texto o sitios web falsos para engañar a los usuarios y que revelen información confidencial como contraseñas, números de tarjetas de crédito o datos personales. Es el vector de ataque inicial más común a nivel mundial, representando más del 36% de las brechas de datos según el informe DBIR 2023 de Verizon."
+        },
+        {
+          "title": "Tipos de Ataques de Ingeniería Social",
+          "body": "Existen múltiples variantes: el spear phishing es dirigido a una persona u organización específica usando información personalizada; el vishing se realiza mediante llamadas telefónicas suplantando a bancos, SII o el Registro Civil; el smishing usa mensajes SMS con URLs acortadas; y el whaling apunta específicamente a ejecutivos o altos funcionarios para obtener autorizaciones de transferencias."
+        },
+        {
+          "title": "Señales de Alerta en un Correo Sospechoso",
+          "body": "Las señales de alerta más comunes en un correo de phishing: remitente con dominio extraño o similar al oficial (ej: 'banco-estado-seguro.com' en vez de 'bancoestado.cl'), uso de urgencia extrema ('su cuenta será bloqueada en 24 horas'), errores ortográficos o de formato, saludos genéricos ('Estimado cliente'), y enlaces cuya URL real difiere del texto mostrado al pasar el cursor."
+        },
+        {
+          "title": "Cómo Verificar un Enlace Sospechoso",
+          "body": "Para verificar un enlace sospechoso, analiza la URL completa: identifica el dominio real (la parte entre el último punto antes del primer slash; en 'http://login.bancochile.ataque.cl/form', el dominio real es 'ataque.cl'). Herramientas gratuitas como VirusTotal (virustotal.com) y Google Safe Browsing permiten analizar URLs y archivos antes de abrirlos."
+        },
+        {
+          "title": "¿Qué Hacer ante un Correo Sospechoso?",
+          "body": "Si recibes un correo sospechoso: no hagas clic en ningún enlace ni descargues archivos adjuntos, no respondas ni proporciones datos, márcalo como phishing en tu cliente de correo. En Chile, los incidentes pueden reportarse al CSIRT de Gobierno en csirt.gob.cl/reportar-incidente o al CSIRT Financiero (csirtfinanciero.cl) si involucra entidades bancarias."
+        }
+      ],
+      "sources": [
+        {
+          "title": "Verizon Data Breach Investigations Report 2023",
+          "author": "Verizon Business",
+          "url": "https://www.verizon.com/business/resources/reports/dbir/"
+        },
+        {
+          "title": "Phishing Guidance: Stopping the Attack Cycle",
+          "author": "CISA — Cybersecurity and Infrastructure Security Agency",
+          "url": "https://www.cisa.gov/resources-tools/resources/phishing-guidance"
+        },
+        {
+          "title": "CSIRT Financiero Chile — Reporte de Incidentes",
+          "author": "CSIRT Financiero Chile",
+          "url": "https://www.csirtfinanciero.cl"
+        },
+        {
+          "title": "Google Safe Browsing — Verificador de URLs",
+          "author": "Google LLC",
+          "url": "https://safebrowsing.google.com/safebrowsing/report_phish/"
+        }
+      ],
+      "quiz": {
+        "question": "¿Cuál de las siguientes situaciones describe con mayor precisión un indicador de phishing en un correo electrónico?",
+        "options": [
+          "Un correo del dominio oficial 'bancoestado.cl' que usa tu nombre completo y no contiene enlaces",
+          "Un mensaje urgente desde 'banco-estado-seguro.net' pidiendo confirmar tu clave de internet en 24 horas",
+          "Una notificación de seguridad con enlace que al pasar el cursor muestra el dominio oficial correcto",
+          "Un aviso de actualización de contraseña enviado desde la app oficial instalada en tu dispositivo"
+        ],
+        "answerIndex": 1
+      }
+    },
+    {
+      "id": 3,
+      "title": "Contraseñas y Autenticación Segura",
+      "description": "Entropía, gestores de contraseñas, autenticación multifactor y recomendaciones NIST SP 800-63B.",
+      "videoUrl": "https://www.youtube.com/embed/aEmXfME3ja8",
+      "sections": [
+        {
+          "title": "Entropía y Fortaleza de las Contraseñas",
+          "body": "La seguridad de una contraseña se mide por su entropía: la cantidad de incertidumbre que contiene. A mayor longitud y variedad de caracteres, mayor entropía. El NIST (SP 800-63B, actualización 2024) recomienda contraseñas de al menos 15 caracteres, priorizando las frases de paso (passphrases). Por ejemplo, 'CaballoPurpuraPlaya!2024' (23 caracteres) es más segura que 'P@$$w0rd' (8 caracteres) y más fácil de recordar."
+        },
+        {
+          "title": "Gestores de Contraseñas",
+          "body": "Los gestores de contraseñas como Bitwarden (gratuito y de código abierto, auditado independientemente), KeePassXC (local, sin nube) o 1Password permiten generar y almacenar contraseñas únicas y complejas para cada servicio. Esta práctica elimina la reutilización de contraseñas, que es la causa principal de compromiso en cadena: cuando una plataforma sufre una brecha, los atacantes prueban las credenciales filtradas en otros servicios (ataque de 'credential stuffing')."
+        },
+        {
+          "title": "Autenticación Multifactor (MFA / 2FA)",
+          "body": "La autenticación multifactor (MFA/2FA) añade una segunda capa de verificación. Los factores se clasifican en: algo que sabes (contraseña), algo que tienes (código TOTP por apps como Aegis o Google Authenticator, o llave FIDO2/U2F como YubiKey) y algo que eres (biometría). El uso de MFA reduce el riesgo de compromiso de cuenta en más del 99,9% según Microsoft Security."
+        },
+        {
+          "title": "Ataques Contra Contraseñas",
+          "body": "Los ataques contra contraseñas incluyen: fuerza bruta (probar todas las combinaciones posibles), diccionario (usar listas de palabras comunes y contraseñas filtradas) y credential stuffing. El sitio HaveIBeenPwned.com permite verificar si tu correo o contraseña ha sido expuesto en brechas de datos conocidas."
+        },
+        {
+          "title": "Reglas Prácticas de Seguridad",
+          "body": "Nunca compartas contraseñas por correo o WhatsApp; las instituciones legítimas (bancos, SII, ChileAtiende) jamás te pedirán tu contraseña por estos medios. Si sospechas compromiso, cámbiala de inmediato en todos los servicios afectados y activa MFA. Revisa regularmente HaveIBeenPwned.com para saber si tus credenciales han sido filtradas."
+        }
+      ],
+      "sources": [
+        {
+          "title": "Digital Identity Guidelines — NIST SP 800-63B",
+          "author": "NIST — National Institute of Standards and Technology",
+          "url": "https://pages.nist.gov/800-63-3/sp800-63b.html"
+        },
+        {
+          "title": "Have I Been Pwned — Verificador de brechas de datos",
+          "author": "Troy Hunt",
+          "url": "https://haveibeenpwned.com"
+        },
+        {
+          "title": "Bitwarden — Gestor de contraseñas de código abierto",
+          "author": "Bitwarden Inc.",
+          "url": "https://bitwarden.com"
+        },
+        {
+          "title": "One simple action to prevent 99.9% of account attacks",
+          "author": "Microsoft Security Blog",
+          "url": "https://www.microsoft.com/en-us/security/blog/2019/08/20/one-simple-action-you-can-take-to-prevent-99-9-percent-of-account-attacks/"
+        }
+      ],
+      "quiz": {
+        "question": "Según el NIST SP 800-63B, ¿cuál de las siguientes prácticas representa la mejor estrategia para gestionar contraseñas de forma segura?",
+        "options": [
+          "Usar una contraseña corta pero compleja como 'P@$5!' y cambiarla cada mes",
+          "Reutilizar una contraseña robusta en múltiples servicios para no olvidarla",
+          "Usar un gestor de contraseñas para crear frases de paso únicas y largas por servicio",
+          "Anotar las contraseñas en un archivo de texto en el escritorio del computador"
+        ],
+        "answerIndex": 2
+      }
+    },
+    {
+      "id": 4,
+      "title": "Protección de Datos Personales en Chile",
+      "description": "Ley 19.628, nueva Ley 21.719, derechos ARCO y obligaciones de los responsables de datos.",
+      "videoUrl": "https://www.youtube.com/embed/E5PeB4CJOSE",
+      "sections": [
+        {
+          "title": "Marco Legal: Leyes 19.628 y 21.719",
+          "body": "En Chile, la protección de datos personales está regulada por la Ley N° 19.628 (1999) y, desde diciembre de 2024, por la Ley N° 21.719 que moderniza dicha regulación. Esta nueva ley crea la Agencia de Protección de Datos Personales (APDP) como organismo autónomo, establece sanciones de hasta 10.000 UTM por infracciones graves y exige notificación de brechas de seguridad en un plazo máximo de 72 horas al regulador y a los afectados."
+        },
+        {
+          "title": "Principios del Tratamiento de Datos",
+          "body": "Los principios fundamentales del tratamiento de datos son: finalidad (los datos solo pueden usarse para el propósito declarado), proporcionalidad (recopilar solo los datos estrictamente necesarios), calidad (los datos deben ser exactos y actualizados), seguridad (deben protegerse con medidas técnicas adecuadas) y licitud (el tratamiento debe contar con consentimiento libre, informado, específico e inequívoco del titular)."
+        },
+        {
+          "title": "Tus Derechos ARCO",
+          "body": "Los titulares cuentan con los derechos ARCO: Acceso (conocer qué datos tiene la organización, con qué finalidad y con quién los comparte), Rectificación (corregir datos inexactos o incompletos), Cancelación (exigir la eliminación cuando ya no sean necesarios o se haya revocado el consentimiento) y Oposición (negarte al tratamiento para ciertos fines). La Ley 21.719 añade además los derechos de portabilidad y de no ser objeto de decisiones automatizadas."
+        },
+        {
+          "title": "Categorías Especiales de Datos",
+          "body": "La Ley 21.719 introduce categorías especiales de datos con protección reforzada: salud, biométricos (huella, rostro, iris), genéticos, origen racial o étnico, opiniones políticas, creencias religiosas, afiliación sindical y vida sexual. Su tratamiento requiere consentimiento explícito o una base legal específica."
+        },
+        {
+          "title": "Cómo Ejercer tus Derechos",
+          "body": "Como ciudadano, puedes ejercer tus derechos contactando al responsable del tratamiento. Si no obtienes respuesta, a partir de la entrada en vigencia plena de la Ley 21.719 podrás reclamar ante la APDP. Practica la 'higiene de datos': revisa periódicamente los permisos de apps móviles, cierra cuentas en desuso y lee las políticas de privacidad antes de registrarte en nuevos servicios."
+        }
+      ],
+      "sources": [
+        {
+          "title": "Ley N° 19.628 sobre Protección de la Vida Privada",
+          "author": "Biblioteca del Congreso Nacional de Chile (BCN)",
+          "url": "https://www.bcn.cl/leychile/navegar?idNorma=141599"
+        },
+        {
+          "title": "Ley N° 21.719 — Nueva Ley de Protección de Datos Personales",
+          "author": "Biblioteca del Congreso Nacional de Chile (BCN)",
+          "url": "https://www.bcn.cl/leychile/navegar?idNorma=1208009"
+        },
+        {
+          "title": "Consejo para la Transparencia — Guía de Protección de Datos",
+          "author": "Consejo para la Transparencia (CPLT)",
+          "url": "https://www.cplt.cl"
+        },
+        {
+          "title": "SERNAC — Derechos digitales del consumidor",
+          "author": "Servicio Nacional del Consumidor (SERNAC)",
+          "url": "https://www.sernac.cl"
+        }
+      ],
+      "quiz": {
+        "question": "¿Qué derecho ARCO faculta a una persona para solicitar que una organización elimine sus datos personales cuando ya no son necesarios para el fin con que fueron recopilados?",
+        "options": [
+          "Derecho de Acceso: conocer qué datos tiene la organización sobre ti",
+          "Derecho de Rectificación: corregir datos incorrectos o desactualizados",
+          "Derecho de Cancelación: exigir la eliminación de tus datos personales",
+          "Derecho de Oposición: negarte al tratamiento de tus datos para ciertos fines"
+        ],
+        "answerIndex": 2
+      }
+    }
+  ]
+}
