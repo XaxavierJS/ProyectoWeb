@@ -1,4 +1,7 @@
 # CiberEscudo — Plataforma de Ciberseguridad Ciudadana
+Integrantes: 
+- Javier Retamal
+- Lucas Pinto
 
 Plataforma web/móvil de capacitación en ciberseguridad dirigida a ciudadanos chilenos. Desarrollada con React + Ionic React, orientada a organismos gubernamentales y organizaciones que necesiten capacitar a su personal en buenas prácticas digitales.
 
