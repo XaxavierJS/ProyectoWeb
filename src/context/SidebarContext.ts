@@ -1,7 +1,7 @@
 /**
  * @file SidebarContext.ts
- * @description Contexto React que comparte el estado abierto/cerrado del sidebar
- *   entre UserLayout y las páginas hijas (UserDashboard, UserModule).
+ * @description Contexto React que comparte el estado del sidebar
+ *   (abierto/cerrado) entre los layouts y las páginas hijas.
  */
 import { createContext, useContext } from 'react';
 

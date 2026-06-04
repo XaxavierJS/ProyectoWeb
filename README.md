@@ -3,20 +3,23 @@ Integrantes:
 - Javier Retamal
 - Lucas Pinto
 
-Plataforma web/móvil de capacitación en ciberseguridad dirigida a ciudadanos chilenos. Desarrollada con React + Ionic React, orientada a organismos gubernamentales y organizaciones que necesiten capacitar a su personal en buenas prácticas digitales.
+Plataforma web/móvil de capacitación en ciberseguridad dirigida a ciudadanos chilenos. Desarrollada con React + Ionic React, backend en Node.js + Express + PostgreSQL. Orientada a organismos gubernamentales y organizaciones que necesiten capacitar a su personal en buenas prácticas digitales.
 
 ---
 
 ## Tabla de contenidos
 
 1. [EP 1.2 — Justificación del problema y análisis del usuario](#ep-12--justificación-del-problema-y-análisis-del-usuario)
-2. [P 1.1 — Requerimientos funcionales y no funcionales](#p-11--requerimientos-funcionales-y-no-funcionales)
+2. [EP 1.1 — Requerimientos funcionales y no funcionales](#ep-11--requerimientos-funcionales-y-no-funcionales)
 3. [EP 1.3 — Bocetos UI/UX y prototipo Figma](#ep-13--bocetos-uiux-y-prototipo-figma)
 4. [EP 1.4 — Arquitectura de navegación y UX](#ep-14--arquitectura-de-navegación-y-ux)
 5. [EP 1.5 — Proyecto Ionic con React](#ep-15--proyecto-ionic-con-react)
 6. [EP 1.6 — Pantallas principales implementadas](#ep-16--pantallas-principales-implementadas)
-7. [Stack tecnológico](#stack-tecnológico)
-8. [Credenciales de prueba](#credenciales-de-prueba)
+7. [EP 2 — Backend e Integración](#ep-2--backend-e-integración)
+8. [Stack tecnológico](#stack-tecnológico)
+9. [Cómo ejecutar](#cómo-ejecutar)
+10. [Estructura del proyecto](#estructura-del-proyecto)
+11. [Credenciales de prueba](#credenciales-de-prueba)
 
 ---
 
@@ -37,7 +40,7 @@ La ciberseguridad es una preocupación creciente tanto para individuos como para
 
 ---
 
-## P 1.1 — Requerimientos funcionales y no funcionales
+## EP 1.1 — Requerimientos funcionales y no funcionales
 
 ### Requerimientos funcionales — Rol Administrador
 
@@ -60,16 +63,16 @@ La ciberseguridad es una preocupación creciente tanto para individuos como para
 | RF-10 | **Realizar mini-test** | Al finalizar la lectura de un módulo, el usuario puede responder un mini-test de selección múltiple. |
 | RF-11 | **Ver resultados del test** | El usuario visualiza el resultado de su mini-test (aprobado / reprobado) con retroalimentación inmediata. |
 | RF-12 | **Ver progreso personal** | El usuario puede consultar su porcentaje de completado general de todos los módulos desde su panel. |
-| RF-13 | **Ver perfil personal** | El usuario puede visualizar la información de su propio perfil (nombre, correo, región, progreso). |
-| RF-14 | **Retomar módulo inconcluso** | El usuario puede continuar un módulo previamente iniciado y no terminado, conservando su estado en el sistema. |
+| RF-13 | **Ver perfil personal** | El usuario puede visualizar la información de su propio perfil (nombre, correo, progreso). |
+| RF-14 | **Retomar módulo inconcluso** | El usuario puede continuar un módulo previamente iniciado y no terminado, conservando su estado en el sistema. Los módulos se desbloquean secuencialmente al completar el anterior. |
 
-> **Nota:** Los flujos de inicio de sesión y registro se encuentran implementados como rutas públicas (`/login`, `/register`) y forman parte de la propuesta base de la plataforma.
+> **Nota:** Los flujos de inicio de sesión y registro se encuentran implementados como rutas públicas (`/login`, `/register`).
 
 ### Requerimientos no funcionales
 
 | N° | Categoría | Descripción |
 |---|---|---|
-| RNF-01 | **Usabilidad** | El diseño debe adaptarse al dispositivo: menú lateral (`aside` / `IonMenu`) en escritorio y barra de navegación inferior (`IonTabs`) en móvil. Las acciones principales deben ser accesibles en un máximo de 3 clics desde cualquier vista. |
+| RNF-01 | **Usabilidad** | El diseño debe adaptarse al dispositivo: menú lateral (`aside`) en escritorio y barra de navegación inferior (`IonTabs`) en móvil. Las acciones principales deben ser accesibles en un máximo de 3 clics desde cualquier vista. |
 | RNF-02 | **Rendimiento** | Las transiciones entre vistas deben completarse en menos de 2 segundos en un dispositivo móvil moderno. El bundle de producción debe estar optimizado mediante code splitting (Vite). |
 | RNF-03 | **Seguridad** | La plataforma debe separar vistas de acceso público (login/registro) de los paneles protegidos. Un usuario no autenticado o con rol incorrecto no puede renderizar componentes privados; será redirigido automáticamente. |
 
@@ -141,7 +144,7 @@ El prototipo considera versión **web** y **móvil** para 7 pantallas distintas,
 | ![Admin Usuarios Web](Documentacion/mockups/admin-users-web.png) | ![Admin Usuarios Móvil](Documentacion/mockups/admin-users-mobile.png) |
 
 - Tabla/lista de usuarios con nombre, correo, rol y progreso
-- Botones de editar y eliminar por fila
+- Botones de crear, editar y eliminar por fila
 - Modal de confirmación para eliminación
 
 #### 7. Gestión de módulos — administrador (`/admin/modulos`)
@@ -151,8 +154,8 @@ El prototipo considera versión **web** y **móvil** para 7 pantallas distintas,
 | ![Admin Módulos Web](Documentacion/mockups/admin-modules-web.png) | ![Admin Módulos Móvil](Documentacion/mockups/admin-modules-mobile.png) |
 
 - Lista de módulos con título y estado
-- Formulario de creación/edición de módulo (título, contenido, preguntas del test)
-- Botones de editar y eliminar con confirmación
+- Formulario de creación/edición de módulo (título, contenido)
+- Botones de crear, editar y eliminar con confirmación
 
 ---
 
@@ -167,11 +170,11 @@ El prototipo considera versión **web** y **móvil** para 7 pantallas distintas,
 /user/*                  → UserLayout.tsx           (requiere autenticación + rol: user)
   /user/dashboard        → UserDashboard.tsx
   /user/module/:id       → UserModule.tsx
-  /user/profile          → Inline en UserLayout
+  /user/profile          → UserProfile.tsx
 /admin/*                 → AdminLayout.tsx          (requiere autenticación + rol: admin)
   /admin/dashboard       → AdminDashboard.tsx
-  /admin/usuarios        → Gestión de usuarios (CRUD)
-  /admin/modulos         → Gestión de módulos (CRUD)
+  /admin/usuarios        → AdminUsers.tsx (CRUD)
+  /admin/modulos         → AdminModules.tsx (CRUD)
   /admin/perfil          → Perfil del administrador
 ```
 
@@ -214,8 +217,8 @@ App
 ### d) Diferenciación de acceso según roles
 
 El componente `PrivateRoute` (`src/routes/PrivateRoute.tsx`) valida en cada render:
-1. Existencia de sesión activa (`mockLogged === "true"` en localStorage)
-2. Coincidencia del rol requerido con el rol almacenado (`mockRole`)
+1. Existencia de sesión activa en localStorage
+2. Coincidencia del rol requerido con el rol almacenado
 
 Si alguna condición falla, redirige a `/login`. Un usuario con rol `user` que acceda a rutas `/admin/*` es rechazado; lo mismo aplica al administrador con rutas `/user/*`.
 
@@ -234,12 +237,12 @@ Si alguna condición falla, redirige a `/login`. Un usuario con rol `user` que a
 1. Administrador inicia sesión → Panel admin
 2. Navega a "Usuarios"
 3. Visualiza la lista de usuarios registrados
-4. Edita datos de un usuario (formulario modal) o lo elimina (confirmación)
+4. Crea, edita o elimina usuarios (formularios modales + confirmación)
 
 ### f) Puntos críticos de interacción
 
 - **Validación de registro:** Alertas visuales en tiempo real (borde rojo + mensaje) para campos inválidos: RUT mal formateado, contraseñas que no coinciden, correo sin formato válido, campos obligatorios vacíos.
-- **Acciones destructivas:** Eliminar usuario o módulo requiere un diálogo de confirmación (`IonAlert`) antes de ejecutarse.
+- **Acciones destructivas:** Eliminar usuario o módulo requiere un diálogo de confirmación antes de ejecutarse.
 - **Redirección automática:** Al expirar la sesión o navegar a una ruta no autorizada, el sistema redirige a `/login` sin exponer datos protegidos.
 
 ### g) Coherencia de experiencia entre dispositivos
@@ -255,58 +258,12 @@ El sidebar y el tab bar muestran las mismas secciones, garantizando que el flujo
 
 - **React Router 5.3** con rutas anidadas permite separar layouts (UserLayout, AdminLayout) del contenido de cada vista, favoreciendo la modularidad y escalabilidad.
 - **Ionic React** gestiona la transición entre vistas nativas en móvil y un comportamiento SPA en web sin duplicar lógica de navegación.
-- **PrivateRoute HOC** centraliza la lógica de autorización: al cambiar el mecanismo de auth (p.ej. JWT real), solo se modifica `src/services/auth.ts`, sin tocar las vistas.
-- **Layout responsivo condicional** (`ion-hide-md-up` / `md:block`) evita mantener dos árboles de componentes distintos para móvil y web, reduciendo la superficie de bugs.
+- **PrivateRoute HOC** centraliza la lógica de autorización.
+- **Layout responsivo condicional** (`ion-hide-md-up` / `md:block`) evita mantener dos árboles de componentes distintos para móvil y web.
 
 ---
 
 ## EP 1.5 — Proyecto Ionic con React
-
-### Estructura modular del proyecto
-
-```
-proyecto-santo-domingo/
-│
-├── index.html                    # HTML raíz, aplica el tema govchile
-├── tailwind.config.js            # Configuración Tailwind + tema DaisyUI govchile
-├── postcss.config.js             # PostCSS para Tailwind
-├── vite.config.ts                # Configuración de Vite
-│
-├── public/                       # Activos estáticos (favicon, manifest)
-│
-├── Documentacion/                # Documentación del proyecto
-│   ├── Requerimientos.md         # Requerimientos funcionales y no funcionales
-│   └── DESIGN.md                 # Decisiones de diseño y arquitectura
-│
-└── src/
-    ├── App.tsx                   # Componente raíz: define todas las rutas
-    ├── main.tsx                  # Punto de entrada: monta App en #root
-    │
-    ├── data/
-    │   └── mockData.json         # Datos mock: usuarios y módulos de capacitación
-    │
-    ├── layout/
-    │   ├── UserLayout.tsx        # Layout usuarios: sidebar + tabs + rutas /user/*
-    │   └── AdminLayout.tsx       # Layout admin: sidebar + rutas /admin/*
-    │
-    ├── pages/
-    │   ├── Login.tsx             # Inicio de sesión (/login)
-    │   ├── Register.tsx          # Registro de usuario (/register)
-    │   ├── UserDashboard.tsx     # Panel usuario: estadísticas y módulos (/user/dashboard)
-    │   ├── UserModule.tsx        # Detalle de módulo: contenido y mini-test (/user/module/:id)
-    │   └── admin/
-    │       └── AdminDashboard.tsx  # Panel admin: usuarios y módulos (/admin/dashboard)
-    │
-    ├── routes/
-    │   └── PrivateRoute.tsx      # Guardia de rutas: valida autenticación y rol
-    │
-    ├── services/
-    │   ├── auth.ts               # Servicio de autenticación mock (localStorage)
-    │   └── mockData.ts           # Interfaces TypeScript y acceso a mockData.json
-    │
-    └── theme/
-        └── variables.css         # Tema govchile: tokens DaisyUI e Ionic
-```
 
 ### a) Uso de React Router
 
@@ -348,24 +305,28 @@ Cada vista vive en `src/pages/` y es agnóstica respecto a cómo es presentada (
 Se implementaron las siguientes pantallas con componentes nativos de Ionic React:
 
 ### 1. Login (`/login`)
-
-Usa `IonPage`, `IonContent`, `IonInput`, `IonButton`. Formulario de inicio de sesión con validación de campos y redirección según rol tras autenticación exitosa.
+Usa `IonPage`, `IonContent`. Formulario de inicio de sesión con validación de campos. Panel de marca lateral en desktop. Soporta autenticación via API real con fallback a mock.
 
 ### 2. Register (`/register`)
-
-Usa `IonPage`, `IonContent`, `IonInput`, `IonSelect`, `IonCheckbox`, `IonButton`. Formulario completo con campos: Nombre, RUT, Correo, Región, Comuna, Contraseña, Confirmación, Aceptación de T&C.
+Usa `IonPage`, `IonContent`. Formulario completo con campos: Nombre, RUT, Correo, Región, Comuna, Contraseña, Confirmación, Aceptación de T&C. Validación de coincidencia de contraseñas en tiempo real.
 
 ### 3. Dashboard de usuario (`/user/dashboard`)
-
-Usa `IonPage`, `IonHeader`, `IonToolbar`, `IonContent`, `IonCard`, `IonProgressBar`. Muestra estadísticas de progreso personal y listado de módulos con tarjetas interactivas.
+Usa `IonPage`, `IonHeader`, `IonToolbar`, `IonContent`, `IonProgressBar`. Muestra estadísticas de progreso personal, nivel y listado de módulos con estado (completado / en curso / bloqueado). Los módulos se desbloquean secuencialmente.
 
 ### 4. Vista de módulo (`/user/module/:id`)
-
-Usa `IonPage`, `IonHeader`, `IonBackButton`, `IonContent`. Renderiza el contenido del módulo seleccionado y el mini-test evaluativo de selección múltiple.
+Usa `IonPage`, `IonHeader`, `IonBackButton`, `IonContent`. Renderiza video educativo, secciones de contenido, fuentes y mini-test evaluativo con retroalimentación inmediata. Progreso persistido en localStorage.
 
 ### 5. Dashboard de administrador (`/admin/dashboard`)
+Usa `IonPage`, `IonHeader`, `IonContent`. Panel con estadísticas de la plataforma, tabla de usuarios y grilla de módulos con acciones de crear, editar y eliminar.
 
-Usa `IonPage`, `IonHeader`, `IonContent`, `IonGrid`, `IonRow`, `IonCol`. Panel con estadísticas de la plataforma y acceso rápido a gestión de usuarios y módulos.
+### 6. Gestión de usuarios (`/admin/usuarios`)
+Página independiente con tabla completa de usuarios, botones crear/editar/eliminar y modales correspondientes.
+
+### 7. Gestión de módulos (`/admin/modulos`)
+Página independiente con grilla de módulos, botones crear/editar/eliminar y modales correspondientes.
+
+### 8. Perfil de usuario (`/user/profile`)
+Página que muestra los datos del usuario logueado (nombre, correo, rol), progreso general y módulos completados.
 
 ### Navegación responsiva implementada
 
@@ -392,7 +353,107 @@ Móvil (<768px):
 
 ---
 
+## EP 2 — Backend e Integración
+
+### EP 2.1 — Servidor Express
+
+Backend en Node.js + TypeScript + Express, puerto 4000. Monta middleware de seguridad (helmet, compression, CORS) y manejo centralizado de errores.
+
+```
+backend/
+├── src/
+│   ├── index.ts           # Punto de entrada
+│   ├── app.ts             # Configuración Express + middleware
+│   ├── db.ts              # Conexión PostgreSQL (Pool)
+│   ├── types.ts           # Tipos compartidos
+│   ├── errors/
+│   │   └── AppError.ts    # Clases de error (AppError, NotFound, Validation, etc.)
+│   ├── utils/
+│   │   └── apiResponse.ts # Respuestas estandarizadas (success, error, paginated)
+│   ├── validators/
+│   │   ├── auth.ts        # Zod: loginSchema, registerSchema
+│   │   ├── user.ts        # Zod: createUserSchema, updateUserSchema
+│   │   └── module.ts      # Zod: createModuleSchema, updateModuleSchema
+│   ├── repositories/
+│   │   ├── userRepo.ts    # Consultas SQL usuarios
+│   │   └── moduleRepo.ts  # Consultas SQL módulos
+│   ├── services/
+│   │   ├── authService.ts # Lógica de login/registro
+│   │   ├── userService.ts # Lógica CRUD usuarios
+│   │   └── moduleService.ts # Lógica CRUD módulos
+│   ├── middleware/
+│   │   └── auth.ts        # Middleware JWT (authenticate)
+│   └── routes/
+│       ├── auth.ts        # POST /login, /register
+│       ├── users.ts       # CRUD usuarios + /me + /me/progress
+│       └── modules.ts     # CRUD módulos + /:id/progress
+```
+
+### EP 2.2 — Base de datos PostgreSQL
+
+| Tabla | Propósito |
+|---|---|
+| `usuarios` | Usuarios del sistema (username, email, password_hash, rol, estado) |
+| `modulos` | Módulos educativos (titulo, descripcion, activo) |
+| `videos` | Videos asociados a módulos |
+| `secciones` | Secciones de contenido por módulo |
+| `fuentes` | Fuentes bibliográficas por módulo |
+| `quizzes` | Preguntas de evaluación por módulo |
+| `opciones_quiz` | Opciones de respuesta para cada quiz |
+| `user_progress` | Progreso del usuario por módulo |
+
+### EP 2.3 — API REST Endpoints
+
+| Método | Ruta | Auth | Descripción |
+|---|---|---|---|
+| `GET` | `/api/health` | No | Estado del servicio |
+| `POST` | `/api/auth/login` | No | Inicia sesión (devuelve JWT) |
+| `POST` | `/api/auth/register` | No | Registra nuevo usuario |
+| `GET` | `/api/modules` | No | Lista módulos |
+| `GET` | `/api/modules/:id` | No | Detalle módulo con secciones, video, quiz |
+| `POST` | `/api/modules` | JWT | Crea módulo |
+| `PUT` | `/api/modules/:id` | JWT | Actualiza módulo |
+| `DELETE` | `/api/modules/:id` | JWT | Elimina módulo |
+| `POST` | `/api/modules/:id/progress` | JWT | Actualiza progreso |
+| `GET` | `/api/users/me` | JWT | Perfil propio |
+| `GET` | `/api/users/me/progress` | JWT | Progreso propio |
+| `GET` | `/api/users` | JWT+admin | Lista usuarios |
+| `GET` | `/api/users/:id` | JWT+admin | Detalle usuario |
+| `POST` | `/api/users` | JWT+admin | Crea usuario |
+| `PUT` | `/api/users/:id` | JWT+admin | Actualiza usuario |
+| `DELETE` | `/api/users/:id` | JWT+admin | Elimina usuario |
+
+### EP 2.4 — Consumo API desde Frontend
+
+- Cliente HTTP en `src/services/api/http.ts` con fetch + Authorization header
+- Servicios: `auth.ts`, `modules.ts`, `users.ts` con tipos
+- Fachada con fallback a datos mock (`dataFacade.ts`)
+- Proxy Vite: `/api` → `localhost:4000`
+
+### EP 2.5 — Autenticación JWT
+
+- Generación de JWT con `jsonwebtoken` (expiración 8h)
+- Middleware `authenticate` valida Bearer token
+- Roles `user` / `admin` en el payload del token
+- Frontend almacena token y rol en localStorage
+
+### EP 2.6 — Validación y Seguridad
+
+- **Zod** para validación de inputs en todos los endpoints
+- **bcrypt** para hash de contraseñas (salt rounds: 10)
+- **Consultas parametrizadas** ($1, $2, ...) contra inyección SQL
+- **Helmet** para headers de seguridad HTTP
+- **CORS** configurado para el frontend
+
+### EP 2.7 — Pruebas funcionales
+
+- Colección Postman disponible en `Documentacion/postman-collection.json` (13 endpoints con tests de validación)
+
+---
+
 ## Stack tecnológico
+
+### Frontend
 
 | Tecnología | Versión | Rol |
 |---|---|---|
@@ -402,28 +463,170 @@ Móvil (<768px):
 | DaisyUI | 5.5 | Sistema de componentes UI |
 | TypeScript | 5.9 | Tipado estático |
 | Vite | 5 | Bundler y servidor de desarrollo |
-| Capacitor | 8.3 | Empaquetado para apps nativas (iOS/Android) |
 | React Router | 5.3 | Navegación SPA |
+| Capacitor | 8.3 | Empaquetado para apps nativas (iOS/Android) |
+| Vitest | 0.34 | Tests unitarios |
 
-## Comandos
+### Backend
+
+| Tecnología | Versión | Rol |
+|---|---|---|
+| Node.js | 20+ | Entorno runtime |
+| Express | 4.22 | Framework HTTP |
+| TypeScript | 5.9 | Tipado estático |
+| PostgreSQL | 16 | Base de datos relacional |
+| pg | 8.21 | Cliente PostgreSQL |
+| jsonwebtoken | 9.0 | Autenticación JWT |
+| bcryptjs | 2.4 | Hash de contraseñas |
+| Zod | 4.4 | Validación de esquemas |
+| helmet | 8+ | Seguridad HTTP |
+| compression | 1.7 | Compresión gzip |
+
+---
+
+## Cómo ejecutar
+
+### Solo frontend (sin backend — usa datos mock)
 
 ```bash
-npm install          # Instalar dependencias
-npm run dev          # Servidor de desarrollo (Vite)
-npm run build        # Verificación TypeScript + build de producción
-npm run preview      # Previsualizar el build de producción
-npm run lint         # Ejecutar ESLint
-npm run test.unit    # Pruebas unitarias con Vitest
-npm run test.e2e     # Pruebas E2E con Cypress
+npm install
+npm run dev
+# → http://localhost:5173
+```
+
+### Frontend + Backend (requiere PostgreSQL)
+
+**Terminal 1 — Backend:**
+```bash
+cd backend
+npm install
+# Configurar backend/.env con DATABASE_URL
+npm run dev
+# → http://localhost:4000
+```
+
+**Terminal 2 — Frontend:**
+```bash
+npm run dev
+# → http://localhost:5173 (proxy automático a :4000)
+```
+
+### Otros comandos
+
+```bash
+npm run build        # TypeScript + build producción
+npm run preview      # Previsualizar build
+npm run lint         # ESLint
+npm run test.unit    # Tests unitarios (Vitest) — 18 tests
+npm run test.e2e     # Tests E2E (Cypress)
+```
+
+---
+
+## Estructura del proyecto
+
+```
+proyecto-santo-domingo/
+│
+├── index.html
+├── vite.config.ts
+├── tailwind.config.js
+├── postcss.config.js
+│
+├── public/                     # Activos estáticos
+│
+├── Documentacion/
+│   ├── Requerimientos.md
+│   ├── Entregables.md
+│   ├── postman-collection.json # Colección Postman (13 endpoints)
+│   └── mockups/                # Capturas UI/UX
+│
+├── backend/                    # Backend Express + PostgreSQL
+│   ├── .env
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       ├── index.ts
+│       ├── app.ts
+│       ├── db.ts
+│       ├── types.ts
+│       ├── errors/AppError.ts
+│       ├── utils/apiResponse.ts
+│       ├── validators/ (auth, user, module)
+│       ├── repositories/ (userRepo, moduleRepo)
+│       ├── services/ (authService, userService, moduleService)
+│       ├── middleware/auth.ts
+│       └── routes/ (auth, users, modules)
+│
+├── cypress/                    # Tests E2E
+│
+└── src/
+    ├── App.tsx                 # Rutas principales
+    ├── main.tsx                # Punto de entrada
+    ├── setupTests.ts           # Configuración Vitest
+    │
+    ├── data/
+    │   └── mockData.json       # Datos mock
+    │
+    ├── context/
+    │   └── SidebarContext.ts   # Estado del sidebar
+    │
+    ├── layout/
+    │   ├── UserLayout.tsx      # Layout usuario (sidebar + tabs)
+    │   └── AdminLayout.tsx     # Layout admin (sidebar + tabs)
+    │
+    ├── pages/
+    │   ├── Login.tsx           # /login
+    │   ├── Register.tsx        # /register
+    │   ├── UserDashboard.tsx   # /user/dashboard
+    │   ├── UserModule.tsx      # /user/module/:id
+    │   ├── UserProfile.tsx     # /user/profile
+    │   └── admin/
+    │       ├── AdminDashboard.tsx
+    │       ├── AdminUsers.tsx
+    │       └── AdminModules.tsx
+    │
+    ├── components/
+    │   └── admin/
+    │       ├── StatCard.tsx
+    │       ├── ConfirmDialog.tsx
+    │       ├── EditUserModal.tsx
+    │       ├── CreateUserModal.tsx
+    │       ├── EditModuleModal.tsx
+    │       └── CreateModuleModal.tsx
+    │
+    ├── routes/
+    │   └── PrivateRoute.tsx    # Guardia de rutas
+    │
+    ├── services/
+    │   ├── auth.ts             # Autenticación (localStorage)
+    │   ├── mockData.ts         # Interfaces y datos mock
+    │   ├── progress.ts         # Progreso de módulos
+    │   └── api/
+    │       ├── http.ts         # Cliente HTTP
+    │       ├── auth.ts         # API auth
+    │       ├── modules.ts      # API módulos
+    │       ├── users.ts        # API usuarios
+    │       ├── types.ts        # Tipos API
+    │       └── facade.ts       # Fachada con fallback mock
+    │
+    └── theme/
+        └── variables.css       # Tema govchile
 ```
 
 ---
 
 ## Credenciales de prueba
 
+### Sin backend (modo desarrollo — datos mock)
+
 | Rol | Correo | Contraseña |
 |---|---|---|
 | Usuario | `usuario@correo.cl` | cualquier texto |
 | Administrador | `admin@plataforma.cl` | cualquier texto |
 
-> El rol se determina automáticamente por si el correo contiene la palabra `admin`. Esta autenticación es mock — no existe backend real. Para integrar uno, reemplazar `src/services/auth.ts`.
+> El login detecta el rol automáticamente: si el correo contiene "admin" → administrador, si no → usuario. Si te registras antes, tus datos se guardan y aparecen en el perfil.
+
+### Con backend real (PostgreSQL)
+
+Las credenciales dependen de los usuarios registrados en la base de datos. El registro y login validan contra la BD.

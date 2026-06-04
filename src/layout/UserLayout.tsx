@@ -14,6 +14,7 @@ import { Route, Redirect, useHistory, useLocation, Link } from 'react-router-dom
 import { home, person, logOut } from 'ionicons/icons';
 import UserDashboard from '../pages/UserDashboard';
 import UserModule    from '../pages/UserModule';
+import UserProfile   from '../pages/UserProfile';
 import { authService } from '../services/auth';
 import { SidebarContext } from '../context/SidebarContext';
 
@@ -169,18 +170,7 @@ const UserLayout: React.FC = () => {
               <IonRouterOutlet>
                 <Route exact path="/user/dashboard" component={UserDashboard} />
                 <Route exact path="/user/module/:id" component={UserModule} />
-                <Route exact path="/user/profile">
-                  <IonPage>
-                    <IonHeader>
-                      <IonToolbar color="primary">
-                        <div className="px-4 py-2 font-semibold">Mi Perfil</div>
-                      </IonToolbar>
-                    </IonHeader>
-                    <IonContent className="ion-padding">
-                      <p className="text-gray-500 text-sm">Perfil en construcción.</p>
-                    </IonContent>
-                  </IonPage>
-                </Route>
+                <Route exact path="/user/profile" component={UserProfile} />
                 <Route exact path="/user">
                   <Redirect to="/user/dashboard" />
                 </Route>

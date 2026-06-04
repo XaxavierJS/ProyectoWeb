@@ -4,14 +4,15 @@
  *   la grilla de módulos de capacitación con indicadores de estado por módulo
  *   (completado, en curso, bloqueado). Ruta: /user/dashboard
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
 } from '@ionic/react';
-import { mockNormalUser, mockModules } from '../services/mockData';
+import { mockNormalUser } from '../services/mockData';
+import type { MockModule } from '../services/mockData';
 import { useSidebar } from '../context/SidebarContext';
-
-const progress = mockNormalUser.progress ?? 0;
+import { progressService } from '../services/progress';
+import { dataFacade } from '../services/api/facade';
 
 const levelLabel = (pct: number) => {
   if (pct >= 80) return { label: 'Experto',    color: 'text-green-600'  };
@@ -21,12 +22,6 @@ const levelLabel = (pct: number) => {
 };
 
 type ModuleStatus = 'completed' | 'in-progress' | 'locked';
-
-const getModuleStatus = (index: number, completed: number): ModuleStatus => {
-  if (index < completed)   return 'completed';
-  if (index === completed) return 'in-progress';
-  return 'locked';
-};
 
 const moduleIcons: Record<number, React.ReactElement> = {
   1: (
@@ -45,8 +40,34 @@ const moduleIcons: Record<number, React.ReactElement> = {
 
 const UserDashboard: React.FC = () => {
   const { toggle: toggleSidebar } = useSidebar();
+  const [modulos, setModulos] = useState<MockModule[]>([]);
+  const [completados, setCompletados] = useState<number[]>([]);
+  const [enProgreso, setEnProgreso] = useState<number[]>([]);
+
+  useEffect(() => {
+    dataFacade.listModules().then(setModulos);
+    setCompletados(progressService.obtenerCompletados());
+    setEnProgreso(progressService.obtenerEnProgreso());
+    const interval = setInterval(() => {
+      setCompletados(progressService.obtenerCompletados());
+      setEnProgreso(progressService.obtenerEnProgreso());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const progress = progressService.obtenerPorcentaje(modulos.length);
+
+  const getModuleStatus = (moduleId: number, index: number): ModuleStatus => {
+    if (completados.includes(moduleId)) return 'completed';
+    if (enProgreso.includes(moduleId)) return 'in-progress';
+    if (index === 0) return 'in-progress';
+    const anterior = modulos[index - 1];
+    if (anterior && completados.includes(anterior.id)) return 'in-progress';
+    return 'locked';
+  };
+
   const { label: levelName, color: levelColor } = levelLabel(progress);
-  const completedModules = Math.round((progress / 100) * mockModules.length);
+  const completedModules = completados.length;
 
   return (
     <IonPage>
@@ -95,7 +116,7 @@ const UserDashboard: React.FC = () => {
               <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mb-3">Progreso Total</p>
               <div className="flex items-end justify-between mb-2">
                 <span className="text-3xl font-bold text-gray-900">{progress}%</span>
-                <span className="text-xs text-gray-400">{completedModules}/{mockModules.length} módulos</span>
+                <span className="text-xs text-gray-400">{completedModules}/{modulos.length} módulos</span>
               </div>
               <progress className="progress progress-primary w-full h-2" value={progress} max="100" />
             </div>
@@ -117,7 +138,7 @@ const UserDashboard: React.FC = () => {
               <div>
                 <p className="text-3xl font-bold mt-3 text-gray-900">
                   {completedModules}
-                  <span className="text-gray-300 text-lg font-normal">/{mockModules.length}</span>
+                  <span className="text-gray-300 text-lg font-normal">/{modulos.length}</span>
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   {completedModules === 0 ? '¡Empieza tu primer módulo!' : 'Continúa así'}
@@ -130,8 +151,8 @@ const UserDashboard: React.FC = () => {
           <div>
             <h2 className="text-lg font-bold text-gray-900 mb-4">Tus Módulos</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {mockModules.map((module, index) => {
-                const status = getModuleStatus(index, completedModules);
+              {modulos.map((module, index) => {
+                const status = getModuleStatus(module.id, index);
 
                 const accentBar =
                   status === 'completed'  ? 'bg-green-500' :
@@ -192,7 +213,7 @@ const UserDashboard: React.FC = () => {
 
                       <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                         <span className="text-xs text-gray-400">
-                          Módulo {module.id} de {mockModules.length}
+                          Módulo {module.id} de {modulos.length}
                         </span>
                         {status === 'locked' ? (
                           <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -209,7 +230,7 @@ const UserDashboard: React.FC = () => {
                               status === 'in-progress' ? 'btn-primary' : 'btn-outline btn-success'
                             }`}
                           >
-                            {status === 'in-progress' ? 'Continuar' : 'Revisar'}
+                            {status === 'in-progress' ? 'Continuar' : status === 'completed' ? 'Repasar' : 'Comenzar'}
                           </a>
                         )}
                       </div>

@@ -1,3 +1,10 @@
+/**
+ * @file tailwind.config.js
+ * @description Configuración de Tailwind CSS y DaisyUI.
+ *   Define el tema personalizado "govchile" con paleta
+ *   de azul institucional, y plugins de tipografía y componentes.
+ */
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [

@@ -17,15 +17,15 @@ import UserLayout  from './layout/UserLayout';
 import AdminLayout from './layout/AdminLayout';
 import { PrivateRoute } from './routes/PrivateRoute';
 
-/* Core CSS required for Ionic components to work properly */
+/* CSS obligatorio para que los componentes Ionic funcionen */
 import '@ionic/react/css/core.css';
 
-/* Basic CSS for apps built with Ionic */
+/* CSS base para aplicaciones Ionic */
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
 
-/* Optional CSS utils that can be commented out */
+/* Utilidades CSS opcionales — se pueden comentar si no se usan */
 import '@ionic/react/css/padding.css';
 import '@ionic/react/css/float-elements.css';
 import '@ionic/react/css/text-alignment.css';
@@ -34,9 +34,9 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
 /**
- * Ionic Dark Mode
+ * Modo oscuro de Ionic
  * -----------------------------------------------------
- * For more info, please see:
+ * Más información en:
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
@@ -44,7 +44,7 @@ import '@ionic/react/css/display.css';
 /* import '@ionic/react/css/palettes/dark.class.css'; */
 /* import '@ionic/react/css/palettes/dark.system.css'; */
 
-/* Theme variables */
+/* Variables de tema personalizadas */
 import './theme/variables.css';
 
 setupIonicReact();
@@ -53,17 +53,15 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        {/* Rutas Públicas */}
+        {/* Rutas públicas — acceso sin autenticación */}
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         
-        {/* Ruta Privada para Usuarios y su jerarquía */}
+        {/* Rutas protegidas por rol */}
         <PrivateRoute path="/user" requiredRole="user" component={UserLayout} />
-        
-        {/* Ruta Privada Admin */}
         <PrivateRoute path="/admin" requiredRole="admin" component={AdminLayout} />
 
-        {/* Home Redirection */}
+        {/* Redirección raíz → login */}
         <Route exact path="/">
           <Redirect to="/login" />
         </Route>

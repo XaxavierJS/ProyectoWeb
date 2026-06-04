@@ -1,329 +1,98 @@
-import express from 'express';
+/**
+ * @file users.ts
+ * @description Rutas CRUD de usuarios. Todas las rutas protegidas
+ *   usan el middleware authenticate. Las operaciones administrativas
+ *   verifican rol admin dentro del servicio.
+ */
+
+import { Router } from 'express';
 import { authenticate, AuthRequest } from '../middleware/auth';
-import { pool } from '../db';
-import bcrypt from 'bcrypt';
+import { userService } from '../services/userService';
+import { createUserSchema, updateUserSchema } from '../validators/user';
+import { ValidationError } from '../errors/AppError';
+import { ApiResponse } from '../utils/apiResponse';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/me', authenticate, async (req: AuthRequest, res) => {
-
-  const userId = req.user?.id;
-
-  const result = await pool.query(
-    `
-    SELECT
-      id,
-      username,
-      email,
-      rol,
-      estado,
-      fecha_creacion
-    FROM usuarios
-    WHERE id = $1
-    `,
-    [userId]
-  );
-
-  if(result.rowCount === 0){
-    return res.status(404).json({
-      error: 'Usuario no encontrado'
-    });
+router.get('/me', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const user = await userService.getProfile(req);
+    ApiResponse.success(res, user);
+  } catch (err) {
+    next(err);
   }
-
-  return res.json(result.rows[0]);
 });
 
-router.get('/me/progress', authenticate, async (req: AuthRequest, res) => {
-
-  const userId = req.user?.id;
-
-  const result = await pool.query(
-    `
-    SELECT
-      p.modulo_id,
-      m.titulo,
-      p.completado
-    FROM progreso_usuario p
-    JOIN modulos m
-      ON p.modulo_id = m.id
-    WHERE p.usuario_id = $1
-    `,
-    [userId]
-  );
-
-  return res.json(result.rows);
+router.get('/me/progress', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const progress = await userService.getProgress(req);
+    ApiResponse.success(res, progress);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get('/', authenticate, async (req: AuthRequest, res) => {
-
-  if(req.user?.role !== 'admin'){
-    return res.status(403).json({
-      error: 'Acceso restringido'
-    });
+router.get('/', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const users = await userService.listAll(req);
+    ApiResponse.success(res, users);
+  } catch (err) {
+    next(err);
   }
-
-  const result = await pool.query(`
-    SELECT
-      id,
-      username,
-      email,
-      rol,
-      estado,
-      fecha_creacion
-    FROM usuarios
-    ORDER BY id
-  `);
-
-  return res.json(result.rows);
 });
 
-router.get('/:id', authenticate, async (req: AuthRequest, res) => {
-
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso restringido.'
-    });
+router.get('/:id', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const user = await userService.getById(req, Number(req.params.id));
+    ApiResponse.success(res, user);
+  } catch (err) {
+    next(err);
   }
-
-  const userId = Number(req.params.id);
-
-  const result = await pool.query(
-    `
-    SELECT
-      id,
-      username,
-      email,
-      rol,
-      estado,
-      fecha_creacion
-    FROM usuarios
-    WHERE id = $1
-    `,
-    [userId]
-  );
-
-  if (result.rowCount === 0) {
-    return res.status(404).json({
-      error: 'Usuario no encontrado.'
-    });
-  }
-
-  return res.json(result.rows[0]);
 });
 
-router.post('/', authenticate, async (req: AuthRequest, res) => {
+router.post('/', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const parsed = createUserSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0].message);
 
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso restringido.'
-    });
+    const user = await userService.create(req, parsed.data);
+    ApiResponse.success(res, user, 201);
+  } catch (err) {
+    next(err);
   }
-
-  const {
-    username,
-    email,
-    password,
-    rol
-  } = req.body;
-
-  if (!username || !email || !password || !rol) {
-    return res.status(400).json({
-      error: 'Faltan campos obligatorios.'
-    });
-  }
-
-  const existe = await pool.query(
-    `
-    SELECT id
-    FROM usuarios
-    WHERE email = $1
-    `,
-    [email]
-  );
-
-  if (existe.rowCount && existe.rowCount > 0) {
-    return res.status(409).json({
-      error: 'Ya existe un usuario con ese correo.'
-    });
-  }
-
-  const hash = await bcrypt.hash(password, 10);
-
-  const result = await pool.query(
-    `
-    INSERT INTO usuarios
-    (
-      username,
-      email,
-      password_hash,
-      rol,
-      estado
-    )
-    VALUES
-    (
-      $1,
-      $2,
-      $3,
-      $4,
-      'activo'
-    )
-    RETURNING
-      id,
-      username,
-      email,
-      rol,
-      estado
-    `,
-    [
-      username,
-      email,
-      hash,
-      rol
-    ]
-  );
-
-  return res.status(201).json(result.rows[0]);
 });
 
-router.put('/:id', authenticate, async (req: AuthRequest, res) => {
+router.put('/:id', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const parsed = updateUserSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0].message);
 
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso restringido.'
-    });
+    const user = await userService.update(req, Number(req.params.id), parsed.data);
+    ApiResponse.success(res, user);
+  } catch (err) {
+    next(err);
   }
-
-  const userId = Number(req.params.id);
-
-  const {
-    username,
-    email,
-    rol,
-    estado
-  } = req.body;
-
-  const result = await pool.query(
-    `
-    UPDATE usuarios
-    SET
-      username = $1,
-      email = $2,
-      rol = $3,
-      estado = $4
-    WHERE id = $5
-    RETURNING
-      id,
-      username,
-      email,
-      rol,
-      estado
-    `,
-    [
-      username,
-      email,
-      rol,
-      estado,
-      userId
-    ]
-  );
-
-  if (result.rowCount === 0) {
-    return res.status(404).json({
-      error: 'Usuario no encontrado.'
-    });
-  }
-
-  return res.json(result.rows[0]);
 });
 
-router.patch('/:id', authenticate, async (req: AuthRequest, res) => {
+router.patch('/:id', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const parsed = updateUserSchema.safeParse(req.body);
+    if (!parsed.success) throw new ValidationError(parsed.error.issues[0].message);
 
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso restringido.'
-    });
+    const user = await userService.update(req, Number(req.params.id), parsed.data);
+    ApiResponse.success(res, user);
+  } catch (err) {
+    next(err);
   }
-
-  const userId = Number(req.params.id);
-
-  const actual = await pool.query(
-    `
-    SELECT *
-    FROM usuarios
-    WHERE id = $1
-    `,
-    [userId]
-  );
-
-  if (actual.rowCount === 0) {
-    return res.status(404).json({
-      error: 'Usuario no encontrado.'
-    });
-  }
-
-  const usuario = actual.rows[0];
-
-  const username = req.body.username ?? usuario.username;
-  const email = req.body.email ?? usuario.email;
-  const rol = req.body.rol ?? usuario.rol;
-  const estado = req.body.estado ?? usuario.estado;
-
-  const result = await pool.query(
-    `
-    UPDATE usuarios
-    SET
-      username = $1,
-      email = $2,
-      rol = $3,
-      estado = $4
-    WHERE id = $5
-    RETURNING
-      id,
-      username,
-      email,
-      rol,
-      estado
-    `,
-    [
-      username,
-      email,
-      rol,
-      estado,
-      userId
-    ]
-  );
-
-  return res.json(result.rows[0]);
 });
 
-router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
-
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({
-      error: 'Acceso restringido.'
-    });
+router.delete('/:id', authenticate, async (req: AuthRequest, res, next) => {
+  try {
+    const result = await userService.delete(req, Number(req.params.id));
+    ApiResponse.success(res, result);
+  } catch (err) {
+    next(err);
   }
-
-  const userId = Number(req.params.id);
-
-  const result = await pool.query(
-    `
-    DELETE FROM usuarios
-    WHERE id = $1
-    RETURNING id
-    `,
-    [userId]
-  );
-
-  if (result.rowCount === 0) {
-    return res.status(404).json({
-      error: 'Usuario no encontrado.'
-    });
-  }
-
-  return res.json({
-    mensaje: 'Usuario eliminado correctamente.'
-  });
 });
 
 export default router;

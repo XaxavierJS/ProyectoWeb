@@ -4,14 +4,16 @@
  *   secciones de contenido tituladas en tarjetas, fuentes citadas y un
  *   mini-test evaluativo. Ruta: /user/module/:id
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle,
   IonContent, IonButtons, IonBackButton,
 } from '@ionic/react';
-import { mockModules } from '../services/mockData';
 import { useSidebar } from '../context/SidebarContext';
+import { progressService } from '../services/progress';
+import { dataFacade } from '../services/api/facade';
+import type { MockModule } from '../services/mockData';
 
 type ModuleRouteParams = { id: string };
 
@@ -26,12 +28,17 @@ const SECTION_COLORS = [
 
 const UserModule: React.FC<RouteComponentProps<ModuleRouteParams>> = ({ match }) => {
   const moduleId   = Number(match.params.id);
-  const moduleData = useMemo(() => mockModules.find(m => m.id === moduleId), [moduleId]);
   const history    = useHistory();
   const { toggle: toggleSidebar } = useSidebar();
 
+  const [moduleData, setModuleData] = useState<MockModule | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [quizResult, setQuizResult]         = useState<'correct' | 'wrong' | null>(null);
+
+  useEffect(() => {
+    dataFacade.getModule(moduleId).then(setModuleData);
+    progressService.iniciar(moduleId);
+  }, [moduleId]);
 
   if (!moduleData) {
     return (
@@ -58,7 +65,9 @@ const UserModule: React.FC<RouteComponentProps<ModuleRouteParams>> = ({ match })
   }
 
   const handleCheckQuiz = () => {
-    setQuizResult(selectedAnswer === moduleData.quiz.answerIndex ? 'correct' : 'wrong');
+    const correcto = selectedAnswer === moduleData.quiz.answerIndex;
+    setQuizResult(correcto ? 'correct' : 'wrong');
+    if (correcto) progressService.completar(moduleId);
   };
 
   const handleRetry = () => {
@@ -99,7 +108,7 @@ const UserModule: React.FC<RouteComponentProps<ModuleRouteParams>> = ({ match })
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
                   Módulo {moduleData.id}
                 </span>
-                <span className="text-xs text-gray-400">de {mockModules.length} módulos</span>
+                <span className="text-xs text-gray-400">de 4 módulos</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900 leading-snug">{moduleData.title}</h1>
               <p className="text-gray-500 mt-2 text-sm leading-relaxed">{moduleData.description}</p>

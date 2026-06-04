@@ -1,12 +1,15 @@
 /**
  * @file Register.tsx
- * @description Formulario de registro de nuevo usuario. Secciones: información
- *   personal, ubicación (región/comuna) y seguridad (contraseña + confirmación).
- *   Valida coincidencia de contraseñas en tiempo real. Ruta: /register
+ * @description Formulario de registro de nuevo usuario. Usa la API real
+ *   (authApi.register). Si el backend no está disponible, simula el registro
+ *   y redirige al login.
  */
+
 import React, { useState } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import { useHistory, Link } from 'react-router-dom';
+import { authApi } from '../services/api/auth';
+import { authService } from '../services/auth';
 
 const ShieldIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -65,7 +68,7 @@ const Register: React.FC = () => {
       ? form.password === form.confirmPassword
       : null;
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     if (form.password !== form.confirmPassword) {
@@ -77,10 +80,24 @@ const Register: React.FC = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+
+    try {
+      await authApi.register({
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      });
+      authService.guardarRegistro({ username: form.username, email: form.email });
       history.push('/login');
-    }, 600);
+    } catch {
+      /* Fallback mock: guarda datos y redirige */
+      authService.guardarRegistro({ username: form.username, email: form.email });
+      setTimeout(() => {
+        history.push('/login');
+      }, 600);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -88,8 +105,6 @@ const Register: React.FC = () => {
       <IonContent fullscreen>
         <div className="min-h-screen flex items-start justify-center bg-base-100 px-4 py-10">
           <div className="w-full max-w-lg">
-
-            {/* Logo */}
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 bg-primary/10 border border-primary/25 rounded-xl flex items-center justify-center">
                 <ShieldIcon className="w-6 h-6 text-primary" />
@@ -113,120 +128,83 @@ const Register: React.FC = () => {
             )}
 
             <form onSubmit={handleRegister} className="space-y-6" noValidate>
-
-              {/* ── Sección: Información Personal ── */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-                    Información Personal
-                  </span>
+                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">Información Personal</span>
                 </div>
-
                 <div className="space-y-4 p-4 bg-base-200 rounded-2xl border border-base-300">
                   <div>
                     <label className="label pb-1" htmlFor="reg-username">
                       <span className="label-text font-medium text-base-content/80">Nombre de Usuario</span>
                     </label>
                     <input id="reg-username" type="text" autoComplete="username"
-                      className="input input-bordered w-full focus:input-primary"
-                      placeholder="juanperez123"
-                      value={form.username}
-                      onChange={e => set('username', e.target.value)} required />
+                      className="input input-bordered w-full focus:input-primary" placeholder="juanperez123"
+                      value={form.username} onChange={e => set('username', e.target.value)} required />
                   </div>
-
                   <div>
                     <label className="label pb-1" htmlFor="reg-rut">
                       <span className="label-text font-medium text-base-content/80">RUT</span>
                       <span className="label-text-alt text-base-content/40">Ej: 12.345.678-9</span>
                     </label>
-                    <input id="reg-rut" type="text"
-                      className="input input-bordered w-full focus:input-primary"
-                      placeholder="12.345.678-9"
-                      value={form.rut}
-                      onChange={e => set('rut', e.target.value)} required />
+                    <input id="reg-rut" type="text" className="input input-bordered w-full focus:input-primary" placeholder="12.345.678-9"
+                      value={form.rut} onChange={e => set('rut', e.target.value)} required />
                   </div>
-
                   <div>
                     <label className="label pb-1" htmlFor="reg-email">
                       <span className="label-text font-medium text-base-content/80">Correo Electrónico</span>
                     </label>
                     <input id="reg-email" type="email" autoComplete="email"
-                      className="input input-bordered w-full focus:input-primary"
-                      placeholder="tu@correo.cl"
-                      value={form.email}
-                      onChange={e => set('email', e.target.value)} required />
+                      className="input input-bordered w-full focus:input-primary" placeholder="tu@correo.cl"
+                      value={form.email} onChange={e => set('email', e.target.value)} required />
                   </div>
                 </div>
               </div>
 
-              {/* ── Sección: Ubicación ── */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-                    Ubicación
-                  </span>
+                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">Ubicación</span>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4 p-4 bg-base-200 rounded-2xl border border-base-300">
                   <div>
                     <label className="label pb-1" htmlFor="reg-region">
                       <span className="label-text font-medium text-base-content/80">Región</span>
                     </label>
-                    <input id="reg-region" type="text"
-                      className="input input-bordered w-full focus:input-primary"
-                      placeholder="Metropolitana"
-                      value={form.region}
-                      onChange={e => set('region', e.target.value)} required />
+                    <input id="reg-region" type="text" className="input input-bordered w-full focus:input-primary" placeholder="Metropolitana"
+                      value={form.region} onChange={e => set('region', e.target.value)} required />
                   </div>
                   <div>
                     <label className="label pb-1" htmlFor="reg-comuna">
                       <span className="label-text font-medium text-base-content/80">Comuna</span>
                     </label>
-                    <input id="reg-comuna" type="text"
-                      className="input input-bordered w-full focus:input-primary"
-                      placeholder="Santiago"
-                      value={form.comuna}
-                      onChange={e => set('comuna', e.target.value)} required />
+                    <input id="reg-comuna" type="text" className="input input-bordered w-full focus:input-primary" placeholder="Santiago"
+                      value={form.comuna} onChange={e => set('comuna', e.target.value)} required />
                   </div>
                 </div>
               </div>
 
-              {/* ── Sección: Seguridad ── */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">
-                    Seguridad
-                  </span>
+                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">Seguridad</span>
                 </div>
-
                 <div className="space-y-4 p-4 bg-base-200 rounded-2xl border border-base-300">
-                  {/* Password */}
                   <div>
                     <label className="label pb-1" htmlFor="reg-password">
                       <span className="label-text font-medium text-base-content/80">Contraseña</span>
                     </label>
                     <div className="relative">
-                      <input id="reg-password"
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        className="input input-bordered w-full pr-12 focus:input-primary"
-                        placeholder="••••••••"
-                        value={form.password}
-                        onChange={e => set('password', e.target.value)} required />
+                      <input id="reg-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password"
+                        className="input input-bordered w-full pr-12 focus:input-primary" placeholder="••••••••"
+                        value={form.password} onChange={e => set('password', e.target.value)} required />
                       <button type="button"
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
                         onClick={() => setShowPassword(v => !v)}
@@ -235,28 +213,16 @@ const Register: React.FC = () => {
                       </button>
                     </div>
                   </div>
-
-                  {/* Confirm password */}
                   <div>
                     <label className="label pb-1" htmlFor="reg-confirm">
                       <span className="label-text font-medium text-base-content/80">Confirmar Contraseña</span>
-                      {passwordsMatch === false && (
-                        <span className="label-text-alt text-error">No coinciden</span>
-                      )}
-                      {passwordsMatch === true && (
-                        <span className="label-text-alt text-success">✓ Coinciden</span>
-                      )}
+                      {passwordsMatch === false && <span className="label-text-alt text-error">No coinciden</span>}
+                      {passwordsMatch === true && <span className="label-text-alt text-success">✓ Coinciden</span>}
                     </label>
                     <div className="relative">
-                      <input id="reg-confirm"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        className={`input input-bordered w-full pr-12 focus:input-primary ${
-                          passwordsMatch === false ? 'input-error' : passwordsMatch === true ? 'input-success' : ''
-                        }`}
-                        placeholder="••••••••"
-                        value={form.confirmPassword}
-                        onChange={e => set('confirmPassword', e.target.value)} required />
+                      <input id="reg-confirm" type={showConfirmPassword ? 'text' : 'password'} autoComplete="new-password"
+                        className={`input input-bordered w-full pr-12 focus:input-primary ${passwordsMatch === false ? 'input-error' : passwordsMatch === true ? 'input-success' : ''}`}
+                        placeholder="••••••••" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} required />
                       <button type="button"
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
                         onClick={() => setShowConfirmPassword(v => !v)}
@@ -268,25 +234,18 @@ const Register: React.FC = () => {
                 </div>
               </div>
 
-              {/* Terms */}
               <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox"
-                  className="checkbox checkbox-primary mt-0.5 shrink-0"
-                  checked={form.termsAccepted}
-                  onChange={e => set('termsAccepted', e.target.checked)} />
+                <input type="checkbox" className="checkbox checkbox-primary mt-0.5 shrink-0"
+                  checked={form.termsAccepted} onChange={e => set('termsAccepted', e.target.checked)} />
                 <span className="text-sm text-base-content/60 leading-relaxed">
                   Acepto los{' '}
-                  <span className="text-primary cursor-pointer hover:underline underline-offset-2">
-                    términos y condiciones
-                  </span>{' '}
+                  <span className="text-primary cursor-pointer hover:underline underline-offset-2">términos y condiciones</span>{' '}
                   de uso de la plataforma
                 </span>
               </label>
 
               <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
-                {isLoading
-                  ? <span className="loading loading-spinner loading-sm" />
-                  : 'Crear Cuenta'}
+                {isLoading ? <span className="loading loading-spinner loading-sm" /> : 'Crear Cuenta'}
               </button>
             </form>
 

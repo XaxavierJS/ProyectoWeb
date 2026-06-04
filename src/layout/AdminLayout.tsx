@@ -14,6 +14,8 @@ import {
 import { Route, Redirect, useHistory, useLocation, Link } from 'react-router-dom';
 import { grid, people, library, person, logOut } from 'ionicons/icons';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminUsers from '../pages/admin/AdminUsers';
+import AdminModules from '../pages/admin/AdminModules';
 import { authService } from '../services/auth';
 import { SidebarContext } from '../context/SidebarContext';
 
@@ -175,12 +177,8 @@ const AdminLayout: React.FC = () => {
           <IonTabs>
             <IonRouterOutlet>
               <Route exact path="/admin/dashboard" component={AdminDashboard} />
-              <Route exact path="/admin/usuarios">
-                <PlaceholderPage title="Gestión de Usuarios" />
-              </Route>
-              <Route exact path="/admin/modulos">
-                <PlaceholderPage title="Gestión de Módulos" />
-              </Route>
+              <Route exact path="/admin/usuarios" component={AdminUsers} />
+              <Route exact path="/admin/modulos" component={AdminModules} />
               <Route exact path="/admin/perfil">
                 <PlaceholderPage title="Mi Perfil" />
               </Route>

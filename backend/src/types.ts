@@ -1,3 +1,9 @@
+/**
+ * @file types.ts
+ * @description Tipos compartidos del backend para usuarios, módulos,
+ *   secciones, fuentes y quizzes.
+ */
+
 export type UserRole = 'user' | 'admin';
 
 export interface User {

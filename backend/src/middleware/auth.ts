@@ -1,3 +1,10 @@
+/**
+ * @file auth.ts
+ * @description Middleware de autenticación JWT para Express.
+ *   Verifica el token Bearer en el header Authorization y
+ *   expone los datos del usuario en req.user.
+ */
+
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 

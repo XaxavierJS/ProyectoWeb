@@ -4,258 +4,39 @@
  *   usuarios con acciones de editar/eliminar, y grilla de módulos con las mismas
  *   acciones. Toda la mutación es local (mock) — sin backend. Ruta: /admin/dashboard
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons,
 } from '@ionic/react';
-import { mockUsers, mockModules, MockUser, MockModule, MockRole } from '../../services/mockData';
+import { MockUser, MockModule } from '../../services/mockData';
 import { useSidebar } from '../../context/SidebarContext';
-
-/* ── Stat Card ── */
-interface StatCardProps {
-  label:   string;
-  value:   string | number;
-  sub?:    string;
-  icon:    React.ReactNode;
-  accent?: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ label, value, sub, icon, accent = 'text-primary' }) => (
-  <div className="bg-white border border-gray-200 rounded-2xl p-5 flex items-start gap-4 shadow-sm">
-    <div className={`w-11 h-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0 ${accent}`}>
-      {icon}
-    </div>
-    <div>
-      <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-900 leading-none">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
-    </div>
-  </div>
-);
-
-/* ── Confirm Dialog ── */
-interface ConfirmDialogProps {
-  message: string;
-  onConfirm: () => void;
-  onCancel:  () => void;
-}
-
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, onCancel }) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-    onClick={onCancel}
-  >
-    <div
-      className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
-      onClick={e => e.stopPropagation()}
-    >
-      <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-        <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-        </svg>
-      </div>
-      <p className="text-center text-sm text-gray-700 font-medium mb-6">{message}</p>
-      <div className="flex gap-3">
-        <button
-          onClick={onCancel}
-          className="flex-1 h-10 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onConfirm}
-          className="flex-1 h-10 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition-colors"
-        >
-          Eliminar
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-/* ── Edit User Modal ── */
-interface EditUserModalProps {
-  user:     MockUser;
-  onChange: (field: keyof MockUser, value: string) => void;
-  onSave:   () => void;
-  onClose:  () => void;
-}
-
-const EditUserModal: React.FC<EditUserModalProps> = ({ user, onChange, onSave, onClose }) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-    onClick={onClose}
-  >
-    <div
-      className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
-      onClick={e => e.stopPropagation()}
-    >
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-base font-bold text-gray-900">Editar Usuario</h3>
-        <button
-          onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-            Nombre de usuario
-          </label>
-          <input
-            type="text"
-            value={user.username}
-            onChange={e => onChange('username', e.target.value)}
-            className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-            Correo electrónico
-          </label>
-          <input
-            type="email"
-            value={user.email}
-            onChange={e => onChange('email', e.target.value)}
-            className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-              Rol
-            </label>
-            <select
-              value={user.role}
-              onChange={e => onChange('role', e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors bg-white"
-            >
-              <option value="user">Usuario</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-              Estado
-            </label>
-            <select
-              value={user.status}
-              onChange={e => onChange('status', e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors bg-white"
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3 mt-6">
-        <button
-          onClick={onClose}
-          className="flex-1 h-10 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onSave}
-          className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-white text-sm font-medium transition-colors"
-        >
-          Guardar
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-/* ── Edit Module Modal ── */
-interface EditModuleModalProps {
-  module:   MockModule;
-  onChange: (field: 'title' | 'description', value: string) => void;
-  onSave:   () => void;
-  onClose:  () => void;
-}
-
-const EditModuleModal: React.FC<EditModuleModalProps> = ({ module, onChange, onSave, onClose }) => (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-    onClick={onClose}
-  >
-    <div
-      className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
-      onClick={e => e.stopPropagation()}
-    >
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-base font-bold text-gray-900">Editar Módulo</h3>
-        <button
-          onClick={onClose}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-            Título del módulo
-          </label>
-          <input
-            type="text"
-            value={module.title}
-            onChange={e => onChange('title', e.target.value)}
-            className="w-full h-10 px-3 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-            Descripción
-          </label>
-          <textarea
-            value={module.description}
-            onChange={e => onChange('description', e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors resize-none"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3 mt-6">
-        <button
-          onClick={onClose}
-          className="flex-1 h-10 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onSave}
-          className="flex-1 h-10 rounded-xl bg-primary hover:bg-primary/90 text-white text-sm font-medium transition-colors"
-        >
-          Guardar
-        </button>
-      </div>
-    </div>
-  </div>
-);
+import { dataFacade } from '../../services/api/facade';
+import StatCard from '../../components/admin/StatCard';
+import ConfirmDialog from '../../components/admin/ConfirmDialog';
+import EditUserModal from '../../components/admin/EditUserModal';
+import EditModuleModal from '../../components/admin/EditModuleModal';
+import CreateUserModal from '../../components/admin/CreateUserModal';
+import CreateModuleModal from '../../components/admin/CreateModuleModal';
 
 /* ── AdminDashboard ── */
 const AdminDashboard: React.FC = () => {
   const { toggle: toggleSidebar } = useSidebar();
 
-  const [users,   setUsers]   = useState<MockUser[]>([...mockUsers]);
-  const [modules, setModules] = useState<MockModule[]>([...mockModules]);
+  const [users,   setUsers]   = useState<MockUser[]>([]);
+  const [modules, setModules] = useState<MockModule[]>([]);
+
+  useEffect(() => {
+    dataFacade.listUsers().then(setUsers);
+    dataFacade.listModules().then(setModules);
+  }, []);
 
   /* edit states */
   const [editingUser,   setEditingUser]   = useState<MockUser | null>(null);
   const [editingModule, setEditingModule] = useState<MockModule | null>(null);
+
+  /* create states */
+  const [creatingUser,   setCreatingUser]   = useState(false);
+  const [creatingModule, setCreatingModule] = useState(false);
 
   /* delete confirm states */
   const [confirmDeleteUserId,   setConfirmDeleteUserId]   = useState<number | null>(null);
@@ -272,7 +53,8 @@ const AdminDashboard: React.FC = () => {
   const openEditUser = (user: MockUser) => setEditingUser({ ...user });
 
   const handleUserFieldChange = (field: keyof MockUser, value: string) => {
-    setEditingUser(prev => prev ? { ...prev, [field]: value as MockRole } : null);
+    if (!editingUser) return;
+    setEditingUser({ ...editingUser, [field]: value });
   };
 
   const saveUser = () => {
@@ -285,6 +67,34 @@ const AdminDashboard: React.FC = () => {
     if (confirmDeleteUserId === null) return;
     setUsers(prev => prev.filter(u => u.id !== confirmDeleteUserId));
     setConfirmDeleteUserId(null);
+  };
+
+  /* ── create handlers ── */
+  const handleCreateUser = (data: { username: string; email: string; password: string; rol: string }) => {
+    const newUser: MockUser = {
+      id: Date.now(),
+      username: data.username,
+      email: data.email,
+      role: data.rol as 'user' | 'admin',
+      status: 'activo',
+      progress: 0,
+    };
+    setUsers(prev => [...prev, newUser]);
+    setCreatingUser(false);
+  };
+
+  const handleCreateModule = (data: { title: string; description: string }) => {
+    const newModule: MockModule = {
+      id: Date.now(),
+      title: data.title,
+      description: data.description,
+      sections: [],
+      videoUrl: undefined,
+      sources: [],
+      quiz: { question: '', options: ['', '', '', ''], answerIndex: 0 },
+    };
+    setModules(prev => [...prev, newModule]);
+    setCreatingModule(false);
   };
 
   /* ── module handlers ── */
@@ -378,7 +188,16 @@ const AdminDashboard: React.FC = () => {
 
           {/* ── Tabla de usuarios ── */}
           <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-3">Usuarios Registrados</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-gray-900">Usuarios Registrados</h2>
+              <button onClick={() => setCreatingUser(true)}
+                className="btn btn-primary btn-sm gap-1">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Nuevo
+              </button>
+            </div>
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -475,7 +294,16 @@ const AdminDashboard: React.FC = () => {
 
           {/* ── Grilla de módulos ── */}
           <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-3">Módulos de la Plataforma</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-gray-900">Módulos de la Plataforma</h2>
+              <button onClick={() => setCreatingModule(true)}
+                className="btn btn-primary btn-sm gap-1">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Nuevo
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {modules.map(module => (
                 <div key={module.id}
@@ -543,6 +371,14 @@ const AdminDashboard: React.FC = () => {
           onSave={saveModule}
           onClose={() => setEditingModule(null)}
         />
+      )}
+
+      {creatingUser && (
+        <CreateUserModal onSave={handleCreateUser} onClose={() => setCreatingUser(false)} />
+      )}
+
+      {creatingModule && (
+        <CreateModuleModal onSave={handleCreateModule} onClose={() => setCreatingModule(false)} />
       )}
 
       {confirmDeleteUserId !== null && (

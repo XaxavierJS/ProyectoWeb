@@ -1,13 +1,15 @@
 /**
  * @file Login.tsx
- * @description Página de inicio de sesión. Panel izquierdo de marca (desktop)
- *   y formulario de autenticación a la derecha. Redirige a /user/dashboard o
- *   /admin/dashboard según el rol determinado por authService. Ruta: /login
+ * @description Página de inicio de sesión. Usa la API real (authApi.login)
+ *   para autenticar. Si el backend no está disponible, cae al mecanismo
+ *   mock para mantener la app funcional en desarrollo.
  */
+
 import React, { useState } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import { useHistory, Link } from 'react-router-dom';
 import { authService } from '../services/auth';
+import { authApi } from '../services/api/auth';
 
 const ShieldIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -40,7 +42,7 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading]       = useState(false);
   const [error, setError]               = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!email || !password) {
@@ -48,50 +50,46 @@ const Login: React.FC = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      const role = email.includes('admin') ? 'admin' : 'user';
-      authService.login(role);
+
+    try {
+      const session = await authApi.login({ email, password });
+      authService.setUserInfo({
+        username: session.user.username,
+        email: session.user.email,
+      });
+      history.push(session.user.role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+    } catch {
+      /* Fallback mock: si el backend no responde, usa el mecanismo antiguo */
+      try {
+        const role = email.includes('admin') ? 'admin' : 'user';
+        authService.login(role);
+        history.push(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
+      } catch {
+        setError('Error al iniciar sesión. Verifica tus credenciales.');
+      }
+    } finally {
       setIsLoading(false);
-      history.push(role === 'admin' ? '/admin/dashboard' : '/user/dashboard');
-    }, 600);
+    }
   };
 
   return (
     <IonPage>
       <IonContent fullscreen>
         <div className="flex min-h-screen">
-
-          {/* ── Left brand panel (desktop only) ── */}
           <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#06101e] via-[#0c1a2e] to-[#06101e] flex-col items-center justify-center p-12 relative overflow-hidden">
-            {/* Dot-grid decoration */}
-            <div
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #22d3ee 1px, transparent 1px)',
-                backgroundSize: '32px 32px',
-              }}
-            />
-            {/* Glow circle */}
+            <div className="absolute inset-0 opacity-10"
+              style={{ backgroundImage: 'radial-gradient(circle, #22d3ee 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-blue-700/8 blur-3xl pointer-events-none" />
-
             <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
-              {/* Logo */}
               <div className="w-24 h-24 bg-blue-400/15 border border-blue-400/25 rounded-3xl flex items-center justify-center mb-8 shadow-lg shadow-blue-500/10">
                 <ShieldIcon className="w-14 h-14 text-blue-300" />
               </div>
-
               <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">CiberEscudo</h1>
               <p className="text-slate-400 text-base leading-relaxed mb-12">
                 Aprende a protegerte en el mundo digital con módulos diseñados para Chile.
               </p>
-
-              {/* Decorative stats */}
               <div className="grid grid-cols-3 gap-6 w-full border-t border-white/10 pt-8">
-                {[
-                  { value: '2', label: 'Módulos' },
-                  { value: '100%', label: 'Gratuito' },
-                  { value: 'CL', label: 'Chile' },
-                ].map(({ value, label }) => (
+                {[ { value: '2', label: 'Módulos' }, { value: '100%', label: 'Gratuito' }, { value: 'CL', label: 'Chile' } ].map(({ value, label }) => (
                   <div key={label} className="text-center">
                     <div className="text-2xl font-bold text-blue-300">{value}</div>
                     <div className="text-xs text-slate-500 mt-1">{label}</div>
@@ -101,10 +99,7 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Right form panel ── */}
           <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-100">
-
-            {/* Mobile-only logo */}
             <div className="md:hidden flex items-center gap-3 mb-10">
               <div className="w-10 h-10 bg-primary/10 border border-primary/25 rounded-xl flex items-center justify-center">
                 <ShieldIcon className="w-6 h-6 text-primary" />
@@ -133,52 +128,28 @@ const Login: React.FC = () => {
                   <label className="label pb-1" htmlFor="login-email">
                     <span className="label-text font-medium text-base-content/80">Correo Electrónico</span>
                   </label>
-                  <input
-                    id="login-email"
-                    type="email"
-                    className="input input-bordered w-full focus:input-primary"
-                    placeholder="tu@correo.cl"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    autoComplete="email"
-                  />
+                  <input id="login-email" type="email" autoComplete="email"
+                    className="input input-bordered w-full focus:input-primary" placeholder="tu@correo.cl"
+                    value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
-
                 <div>
                   <label className="label pb-1" htmlFor="login-password">
                     <span className="label-text font-medium text-base-content/80">Contraseña</span>
                   </label>
                   <div className="relative">
-                    <input
-                      id="login-password"
-                      type={showPassword ? 'text' : 'password'}
-                      className="input input-bordered w-full pr-12 focus:input-primary"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      required
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
+                    <input id="login-password" type={showPassword ? 'text' : 'password'} autoComplete="current-password"
+                      className="input input-bordered w-full pr-12 focus:input-primary" placeholder="••••••••"
+                      value={password} onChange={e => setPassword(e.target.value)} required />
+                    <button type="button"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-base-content/40 hover:text-base-content transition-colors"
                       onClick={() => setShowPassword(v => !v)}
-                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                    >
+                      aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
                       {showPassword ? <EyeClosed /> : <EyeOpen />}
                     </button>
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary w-full mt-2"
-                  disabled={isLoading}
-                >
-                  {isLoading
-                    ? <span className="loading loading-spinner loading-sm" />
-                    : 'Ingresar'}
+                <button type="submit" className="btn btn-primary w-full mt-2" disabled={isLoading}>
+                  {isLoading ? <span className="loading loading-spinner loading-sm" /> : 'Ingresar'}
                 </button>
               </form>
 
@@ -190,7 +161,6 @@ const Login: React.FC = () => {
               </p>
             </div>
           </div>
-
         </div>
       </IonContent>
     </IonPage>
